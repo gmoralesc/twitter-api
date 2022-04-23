@@ -3,6 +3,9 @@ const api = require('./api/v1');
 
 const app = express();
 
+// parse application/json
+app.use(express.json());
+
 app.use('/api/v1', api);
 
 app.use((req, res, next) => {
