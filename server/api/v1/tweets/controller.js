@@ -45,6 +45,13 @@ exports.create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
   const { id } = decoded;
 
+  // const safeFields = Object.getOwnPropertyNames(body).reduce((field, list) => {
+  //   if (Object.getOwnPropertyNames(fields).includes(field)) {
+  //     list[field] = body[field]
+  //   }
+  //   return list
+  // }, {})
+
   const document = new Model({
     ...body,
     userId: id,

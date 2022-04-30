@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const { body } = require('express-validator');
+
 const { Schema } = mongoose;
 
 const fields = {
@@ -31,6 +33,8 @@ const virtuals = {
   },
 };
 
+const sanatizers = [body('content').escape()];
+
 const tweet = new Schema(Object.assign(fields, references), {
   timestamps: true,
   toJSON: {
@@ -45,4 +49,5 @@ module.exports = {
   fields,
   references,
   virtuals,
+  sanatizers,
 };
