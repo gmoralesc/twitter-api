@@ -4,14 +4,15 @@ const router = express.Router();
 const controller = require('./controller');
 
 /*
- * /api/v1/users     POST   Create
- * /api/v1/users     GET    Read all
+ * /api/v1/users/signup     POST   Create
+ * /api/v1/users/signin     POST   Login
  * /api/v1/users/:id GET    Read
  * /api/v1/users/:id PUT    Update
  * /api/v1/users/:id DELETE Delete
  */
 
-router.route('/').get(controller.all).post(controller.create);
+router.route('/signup').post(controller.signup);
+router.route('/signin').post(controller.signin);
 
 router.param('id', controller.id);
 

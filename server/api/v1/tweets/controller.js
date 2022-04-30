@@ -42,9 +42,13 @@ exports.all = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-  const { body = {} } = req;
+  const { body = {}, decoded = {} } = req;
+  const { id } = decoded;
 
-  const document = new Model(body);
+  const document = new Model({
+    ...body,
+    userId: id,
+  });
 
   try {
     const data = await document.save();

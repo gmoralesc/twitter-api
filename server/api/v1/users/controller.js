@@ -1,5 +1,6 @@
 const { Model, fields } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
+const { signToken } = require('../auth');
 
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
@@ -36,7 +37,39 @@ exports.all = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
+exports.signin = async (req, res, next) => {
+  const { body = {} } = req;
+  const { username = '', password = '' } = body;
+
+  const document = await Model.findOne({ username });
+
+  if (document) {
+    const verified = await document.verifyPassword(password);
+    if (verified) {
+      const payload = {
+        id: document._id,
+      };
+      const token = signToken(payload);
+
+      res.json({
+        data: document,
+        meta: {
+          token,
+        },
+      });
+    } else {
+      next({
+        message: 'Username or password are incorrect',
+      });
+    }
+  } else {
+    next({
+      message: 'Username or password are incorrect',
+    });
+  }
+};
+
+exports.signup = async (req, res, next) => {
   const { body = {} } = req;
 
   const document = new Model(body);
