@@ -15,11 +15,34 @@ const fields = {
   },
 };
 
-const tweet = new Schema(fields, {
+const references = {
+  userId: {
+    type: Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
+};
+
+const virtuals = {
+  comments: {
+    ref: 'comment',
+    localField: '_id',
+    foreignField: 'tweetId',
+  },
+};
+
+const tweet = new Schema(Object.assign(fields, references), {
   timestamps: true,
+  toJSON: {
+    virtuals: true,
+  },
 });
+
+tweet.virtual('comments', virtuals.comments);
 
 module.exports = {
   Model: mongoose.model('tweet', tweet),
   fields,
+  references,
+  virtuals,
 };
