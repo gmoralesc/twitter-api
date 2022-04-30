@@ -1,8 +1,25 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const fields = {
-  content: String,
-  likes: Number,
+  content: {
+    type: String,
+    required: true,
+    trim: true,
+    minlength: 1,
+    maxlength: 255,
+  },
+  likes: {
+    type: Number,
+    default: 0,
+  },
 };
 
-module.exports = mongoose.model('tweet', fields);
+const tweet = new Schema(fields, {
+  timestamps: true,
+});
+
+module.exports = {
+  Model: mongoose.model('tweet', tweet),
+  fields,
+};
