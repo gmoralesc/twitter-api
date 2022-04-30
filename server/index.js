@@ -1,7 +1,16 @@
 const express = require('express');
+const cors = require('cors');
+
 const api = require('./api/v1');
 
 const app = express();
+
+// cors
+app.use(
+  cors({
+    origin: '*',
+  }),
+);
 
 // parse application/json
 app.use(express.json());
