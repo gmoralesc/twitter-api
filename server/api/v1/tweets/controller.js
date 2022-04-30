@@ -1,42 +1,88 @@
-exports.all = (req, res, next) => {
-  const { query = {} } = req;
-  res.json({
-    data: [],
-    included: {
-      query,
-    },
-  });
+const Model = require('./model');
+
+exports.all = async (req, res, next) => {
+  try {
+    const data = await Model.find({}).exec();
+
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.create = (req, res, next) => {
+exports.create = async (req, res, next) => {
   const { body = {} } = req;
 
-  res.json({
-    data: body,
-  });
+  const document = new Model(body);
+
+  try {
+    const data = await document.save();
+
+    res.status(201);
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.read = (req, res, next) => {
+exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
+  try {
+    const data = await Model.findById(id).exec();
+
+    if (data) {
+      req.doc = data;
+      next();
+    } else {
+      next({
+        statusCode: 404,
+        message: 'Document not found',
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.read = async (req, res, next) => {
+  const { doc = {} } = req;
+
   res.json({
-    data: {
-      id,
-    },
+    data: doc,
   });
 };
 
-exports.update = (req, res, next) => {
-  const { body = {}, params = {} } = req;
-  res.json({
-    data: body,
-    included: {
-      params,
-    },
-  });
+exports.update = async (req, res, next) => {
+  const { body = {}, doc = {} } = req;
+
+  Object.assign(doc, body);
+
+  try {
+    const data = await doc.save();
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-exports.delete = (req, res, next) => {
-  res.json({});
+exports.delete = async (req, res, next) => {
+  const { params = {} } = req;
+  const { id } = params;
+
+  try {
+    const data = await Model.findByIdAndDelete(id);
+    res.json({
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
