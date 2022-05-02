@@ -2,6 +2,7 @@ const express = require('express');
 // eslint-disable-next-line
 const router = express.Router();
 const controller = require('./controller');
+const { auth, me } = require('../auth');
 
 /*
  * /api/v1/users/signup     POST   Create
@@ -19,8 +20,8 @@ router.param('id', controller.id);
 router
   .route('/:id')
   .get(controller.read)
-  .patch(controller.update)
-  .put(controller.update)
-  .delete(controller.delete);
+  .patch(auth, me, controller.update)
+  .put(auth, me, controller.update)
+  .delete(auth, me, controller.delete);
 
 module.exports = router;
