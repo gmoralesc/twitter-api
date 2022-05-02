@@ -58,9 +58,18 @@ user.virtual('name').get(function () {
   return this.firstname + ' ' + this.lastname;
 });
 
-user.pre(['save', 'findByIdAndUpdate'], async function (next) {
-  if (this.isNew || this.isModified('password')) {
+user.pre('save', async function (next) {
+  if (this.isNew) {
     this.password = await hash(this.password, 10);
+  }
+  next();
+});
+
+// findByIdAndUpdate is wrapper of indOneAndUpdate
+user.pre('findOneAndUpdate', async function (next) {
+  // this._update has any modified property
+  if (this._update.password) {
+    this._update.password = await hash(this._update.password, 10);
   }
   next();
 });
