@@ -47,8 +47,22 @@ const owner = (req, res, next) => {
   }
 };
 
+const me = (req, res, next) => {
+  const { doc = {}, decoded = {} } = req;
+
+  if (doc.id === decoded.id) {
+    next();
+  } else {
+    next({
+      statusCode: 403,
+      message: 'Forbidden',
+    });
+  }
+};
+
 module.exports = {
   signToken,
   auth,
   owner,
+  me,
 };
