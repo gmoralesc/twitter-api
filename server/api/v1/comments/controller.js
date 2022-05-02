@@ -1,10 +1,11 @@
-const { Model, fields } = require('./model');
+const { Model, fields, references } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
+  const populate = Object.getOwnPropertyNames(references).join(' ');
 
   try {
     const [data = [], total = 0] = await Promise.all([
@@ -14,6 +15,7 @@ exports.all = async (req, res, next) => {
         .sort({
           [sortBy]: direction,
         })
+        .populate(populate)
         .exec(),
       Model.countDocuments(),
     ]);
@@ -37,9 +39,13 @@ exports.all = async (req, res, next) => {
 };
 
 exports.create = async (req, res, next) => {
-  const { body = {} } = req;
+  const { body = {}, decoded = {} } = req;
+  const { id } = decoded;
 
-  const document = new Model(body);
+  const document = new Model({
+    ...body,
+    userId: id,
+  });
 
   try {
     const data = await document.save();
@@ -57,8 +63,10 @@ exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
+  const populate = Object.getOwnPropertyNames(references).join(' ');
+
   try {
-    const data = await Model.findById(id).exec();
+    const data = await Model.findById(id).populate(populate).exec();
 
     if (data) {
       req.doc = data;
