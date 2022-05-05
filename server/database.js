@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const { logger } = require('./logger');
 
 exports.connect = function ({
   protocol = 'mongodb',
@@ -16,26 +17,26 @@ exports.connect = function ({
   mongoose.connect(dburl);
 
   mongoose.connection.on('open', function () {
-    console.log('Database connected');
+    logger.info('Database connected');
   });
 
   mongoose.connection.on('close', function () {
-    console.log('Database discconnected');
+    logger.info('Database discconnected');
   });
 
   mongoose.connection.on('error', function (error) {
-    console.error(error);
+    logger.error(error);
   });
 
   process.on('SIGINT', function () {
     mongoose.connect.close(function () {
-      console.log('Database discconnected');
+      logger.info('Database discconnected');
     });
   });
 };
 
 exports.disconnect = function () {
   mongoose.connect.close(function () {
-    console.log('Database discconnected');
+    logger.info('Database discconnected');
   });
 };

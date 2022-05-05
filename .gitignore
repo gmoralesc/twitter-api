@@ -1,4 +1,5 @@
 node_modules/
+logs/
 Thumbs.db
 .DS_Store
 .env
