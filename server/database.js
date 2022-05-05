@@ -27,11 +27,11 @@ exports.connect = function ({
     console.error(error);
   });
 
-  process.on('SIGINT', function () {
-    mongoose.connection.close(function () {
-      console.log('Database discconnected');
-    });
-  });
+  // process.on('SIGINT', function () {
+  //   mongoose.connection.close(function () {
+  //     console.log('Database discconnected');
+  //   });
+  // });
 };
 
 exports.disconnect = function () {
