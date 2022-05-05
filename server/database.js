@@ -29,14 +29,14 @@ exports.connect = function ({
   });
 
   process.on('SIGINT', function () {
-    mongoose.connect.close(function () {
+    mongoose.connection.close(function () {
       logger.info('Database discconnected');
     });
   });
 };
 
 exports.disconnect = function () {
-  mongoose.connect.close(function () {
+  mongoose.connection.close(function () {
     logger.info('Database discconnected');
   });
 };
