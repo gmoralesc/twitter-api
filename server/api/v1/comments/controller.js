@@ -1,14 +1,11 @@
-const { Model, fields, references, virtuals } = require('./model');
+const { Model, fields, references } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
-  const populate = [
-    ...Object.getOwnPropertyNames(references),
-    ...Object.getOwnPropertyNames(virtuals),
-  ].join(' ');
+  const populate = Object.getOwnPropertyNames(references).join(' ');
 
   try {
     const [data = [], total = 0] = await Promise.all([
@@ -44,13 +41,6 @@ exports.all = async (req, res, next) => {
 exports.create = async (req, res, next) => {
   const { body = {}, decoded = {} } = req;
   const { id } = decoded;
-
-  // const safeFields = Object.getOwnPropertyNames(body).reduce((field, list) => {
-  //   if (Object.getOwnPropertyNames(fields).includes(field)) {
-  //     list[field] = body[field]
-  //   }
-  //   return list
-  // }, {})
 
   const document = new Model({
     ...body,

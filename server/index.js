@@ -1,7 +1,16 @@
 const express = require('express');
+const cors = require('cors');
+
 const api = require('./api/v1');
 
 const app = express();
+
+// cors
+app.use(
+  cors({
+    origin: '*',
+  }),
+);
 
 // parse application/json
 app.use(express.json());
@@ -16,9 +25,12 @@ app.use((req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
-  const { message = '', statusCode = 500 } = err;
+  const { message = '' } = err;
+  let { statusCode = 500 } = err;
 
-  console.error(message);
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+  }
 
   res.status(statusCode);
   res.json({

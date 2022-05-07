@@ -1,14 +1,11 @@
-const { Model, fields, references, virtuals } = require('./model');
+const { Model, fields } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
+const { signToken } = require('../auth');
 
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
-  const populate = [
-    ...Object.getOwnPropertyNames(references),
-    ...Object.getOwnPropertyNames(virtuals),
-  ].join(' ');
 
   try {
     const [data = [], total = 0] = await Promise.all([
@@ -18,7 +15,6 @@ exports.all = async (req, res, next) => {
         .sort({
           [sortBy]: direction,
         })
-        .populate(populate)
         .exec(),
       Model.countDocuments(),
     ]);
@@ -41,21 +37,42 @@ exports.all = async (req, res, next) => {
   }
 };
 
-exports.create = async (req, res, next) => {
-  const { body = {}, decoded = {} } = req;
-  const { id } = decoded;
+exports.signin = async (req, res, next) => {
+  const { body = {} } = req;
+  const { username = '', password = '' } = body;
 
-  // const safeFields = Object.getOwnPropertyNames(body).reduce((field, list) => {
-  //   if (Object.getOwnPropertyNames(fields).includes(field)) {
-  //     list[field] = body[field]
-  //   }
-  //   return list
-  // }, {})
+  const document = await Model.findOne({ username });
 
-  const document = new Model({
-    ...body,
-    userId: id,
-  });
+  if (document) {
+    const verified = await document.verifyPassword(password);
+    if (verified) {
+      const payload = {
+        id: document._id,
+      };
+      const token = signToken(payload);
+
+      res.json({
+        data: document,
+        meta: {
+          token,
+        },
+      });
+    } else {
+      next({
+        message: 'Username or password are incorrect',
+      });
+    }
+  } else {
+    next({
+      message: 'Username or password are incorrect',
+    });
+  }
+};
+
+exports.signup = async (req, res, next) => {
+  const { body = {} } = req;
+
+  const document = new Model(body);
 
   try {
     const data = await document.save();
@@ -73,10 +90,8 @@ exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
-  const populate = Object.getOwnPropertyNames(references).join(' ');
-
   try {
-    const data = await Model.findById(id).populate(populate).exec();
+    const data = await Model.findById(id).exec();
 
     if (data) {
       req.doc = data;
