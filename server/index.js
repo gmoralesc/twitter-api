@@ -1,8 +1,11 @@
 const express = require('express');
 const cors = require('cors');
+<<<<<<< HEAD
 const { v4: uuidv4 } = require('uuid');
 
 const { logger, requests } = require('./logger');
+=======
+>>>>>>> main
 
 const api = require('./api/v1');
 
@@ -15,6 +18,7 @@ app.use(
   }),
 );
 
+<<<<<<< HEAD
 // Add unique ID to every request
 app.use((req, res, next) => {
   req.id = uuidv4();
@@ -24,6 +28,8 @@ app.use((req, res, next) => {
 // Log every incoming request
 app.use(requests);
 
+=======
+>>>>>>> main
 // parse application/json
 app.use(express.json());
 
