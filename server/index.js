@@ -1,10 +1,11 @@
 const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
+const swaggerUi = require('swagger-ui-express');
 
 const { logger, requests } = require('./logger');
-
 const api = require('./api/v1');
+const docs = require('./api/v1/docs');
 
 const app = express();
 
@@ -29,6 +30,9 @@ app.use(express.json());
 
 // set API version
 app.use('/api/v1', api);
+
+// Docs
+app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(docs));
 
 // Middleware to handle Not Route Found
 app.use((req, res, next) => {
