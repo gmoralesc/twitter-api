@@ -1,8 +1,5 @@
 const mongoose = require('mongoose');
-<<<<<<< HEAD
 const { logger } = require('./logger');
-=======
->>>>>>> main
 
 exports.connect = function ({
   protocol = 'mongodb',
@@ -40,10 +37,6 @@ exports.connect = function ({
 
 exports.disconnect = function () {
   mongoose.connection.close(function () {
-<<<<<<< HEAD
     logger.info('Database discconnected');
-=======
-    console.log('Database discconnected');
->>>>>>> main
   });
 };
