@@ -1,14 +1,15 @@
 const { Model, fields, references, virtuals } = require('./model');
 const { paginationParseParams, sortParseParams } = require('./../../../utils');
 
+const populate = [
+  ...Object.getOwnPropertyNames(references),
+  ...Object.getOwnPropertyNames(virtuals),
+].join(' ');
+
 exports.all = async (req, res, next) => {
   const { query = {} } = req;
   const { limit, skip } = paginationParseParams(query);
   const { sortBy, direction } = sortParseParams(query, fields);
-  const populate = [
-    ...Object.getOwnPropertyNames(references),
-    ...Object.getOwnPropertyNames(virtuals),
-  ].join(' ');
 
   try {
     const [data = [], total = 0] = await Promise.all([
@@ -73,10 +74,16 @@ exports.id = async (req, res, next) => {
   const { params = {} } = req;
   const { id = '' } = params;
 
-  const populate = Object.getOwnPropertyNames(references).join(' ');
-
   try {
-    const data = await Model.findById(id).populate(populate).exec();
+    const data = await Model.findById(id)
+      .populate(populate)
+      .populate({
+        path: 'comments',
+        populate: {
+          path: 'userId',
+        },
+      })
+      .exec();
 
     if (data) {
       req.doc = data;
@@ -107,7 +114,10 @@ exports.update = async (req, res, next) => {
   try {
     const data = await Model.findByIdAndUpdate(id, body, {
       new: true,
-    });
+    })
+      .populate(populate)
+      .exec();
+
     res.json({
       data,
     });
