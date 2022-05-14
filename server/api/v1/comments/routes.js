@@ -3,6 +3,7 @@ const express = require('express');
 const router = express.Router();
 const controller = require('./controller');
 const { auth, owner } = require('../auth');
+const { sanatizers } = require('./model');
 
 /*
  * /api/v1/comments     POST   Create
@@ -12,15 +13,15 @@ const { auth, owner } = require('../auth');
  * /api/v1/comments/:id DELETE Delete
  */
 
-router.route('/').get(controller.all).post(auth, controller.create);
+router.route('/').get(controller.all).post(auth, sanatizers, controller.create);
 
 router.param('id', controller.id);
 
 router
   .route('/:id')
   .get(controller.read)
-  .patch(auth, owner, controller.update)
-  .put(auth, owner, controller.update)
+  .patch(auth, owner, sanatizers, controller.update)
+  .put(auth, owner, sanatizers, controller.update)
   .delete(auth, owner, controller.delete);
 
 module.exports = router;
